@@ -9,8 +9,7 @@ calculate_pod_quantiles(
   resample_size = 1000,
   interpolation_size = 50,
   quantile_probs = c(0.05, 0.5, 0.95),
-  single_threshold = 0.5,
-  n_cores = NULL
+  dr_threshold = 0.8
 )
 }
 \arguments{
@@ -24,9 +23,8 @@ sample's concentration.}
 
 \item{quantile_probs}{The quantiles to report for POD predictions}
 
-\item{single_threshold}{Not in use yet.}
-
-\item{n_cores}{The number of cores to use for resampling.}
+\item{dr_threshold}{A value between 0 and 1. Default 0.8. The percentage of doses that
+have at least 3 responses. Allows cases where some doses have few samples.}
 }
 \description{
 Returns quantiles from estimated Point of Departure distribution

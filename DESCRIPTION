@@ -9,16 +9,10 @@ Authors@R:
            comment = c(ORCID = "YOUR-ORCID-ID"))
 Description: Estimating Point of Departure (POD) from dose-response data using spline meta-regression.
 Imports:
-	testthat,
-	parallel,
-	purrr,
-	dplyr,
-	tidyr,
-	magrittr,
-	rlang
+	testthat
 License: `use_mit_license()`, `use_gpl3_license()` or friends to
     pick a license
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.1.0.9000
+RoxygenNote: 7.1.1

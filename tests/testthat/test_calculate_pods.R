@@ -1,4 +1,4 @@
-context("calculate_menger_curvature.R")
+context("calculate_pods.R")
 
 test_that("Does Menger Curvature calculation perform as expected?", {
   # Does the function stop if the input vectors are incorrect length?
@@ -24,4 +24,12 @@ test_that("Does Menger Curvature function match hand calculation?", {
   expect_equal(round(calculate_menger_curvature(c(1, 3, 5), c(2, 3, 6)), 6), 0.175412)
   expect_equal(round(calculate_menger_curvature(c(40, 50, 52), c(43, 63, 70)), 6), 0.012474)
   expect_equal(round(calculate_menger_curvature(c(0, 1, 2), c(1, 0.5, 1.5)), 6), 0.920358)
+})
+
+test_that("Does the correct POD get returned from MC calculations?", {
+  sim_predictedDR <- list(
+    x = 1:10,
+    y = sin(1:10)
+  )
+  expect_true(calculate_pod_from_menger_curvature(sim_predictedDR)["log10_pod"] == 8)
 })
