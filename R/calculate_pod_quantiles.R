@@ -28,5 +28,11 @@ calculate_pod_quantiles <- function(dose_response_data,
   
   # Calculate quantiles
   pods_dose <- sapply(pods, function(x) x["pod"])
-  quantile(pods_dose, quantile_probs)
+  names(pods_dose) <- NULL
+  pod_quants <- quantile(pods_dose, quantile_probs)
+  # Return pod vector and quantiles
+  list(
+    pod_distribution = pods_dose,
+    pod_quantiles = pod_quants
+  )
 }
