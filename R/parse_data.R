@@ -22,6 +22,9 @@ parse_data <- function(dose_response_data, dr_threshold = 0.8) {
     stop("Doses and responses should be numeric")
   }
   
+  # Remove zero-doses
+  dose_response_data <- dose_response_data[dose_response_data[,1] != 0,]
+  
   # Need at least 4 doses 
   n_doses <- length(unique(dose_response_data[,1]))
   if (n_doses < 4) {
@@ -44,7 +47,7 @@ parse_data <- function(dose_response_data, dr_threshold = 0.8) {
   dose_response_data <- dose_response_data[order(dose_response_data$dose),]
   
   # Convert doses to log10 scale
-  dose_response_data$log10_dose <- log10(dose_response_data$dose + 1)
+  dose_response_data$log10_dose <- log10(dose_response_data$dose)
   dose_response_data <- dose_response_data[,c("dose", "log10_dose", "response")]
   # Format data as list
   dose_response_data <- split(dose_response_data, dose_response_data[,1])

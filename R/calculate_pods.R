@@ -60,7 +60,7 @@ calculate_pod_from_menger_curvature <- function(predicted_dose_response) {
   }
   # Return the dose corresponding to the highest curvature.
   pod <- MC_values$log10_dose[which.max(MC_values$mc)]
-  c(pod = 10^(pod) - 1,
+  c(pod = 10^(pod),
              log10_pod = pod)
 }
 

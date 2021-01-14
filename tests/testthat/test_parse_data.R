@@ -3,9 +3,9 @@ context("parse_data.R")
 test_that("Are the data being prepared correctly?", {
   # Does the function return a list with the correct dimensions
   parse_test_1 <- parse_data(test_data_tnt)
-  expect_length(parse_test_1, 6)
-  expect_equal(names(parse_test_1), c("0", "0.3125", "0.625", "1.25", "2.5", "5"))
-  expect_true(all(matrix(c(4,3), ncol = 6, nrow = 2) == sapply(parse_test_1, dim)))
+  expect_length(parse_test_1, 5)
+  expect_equal(names(parse_test_1), c("0.3125", "0.625", "1.25", "2.5", "5"))
+  expect_true(all(matrix(c(4,3), ncol = 5, nrow = 2) == sapply(parse_test_1, dim)))
   
   # Are errors produced? 
   # Number of columns
@@ -17,13 +17,13 @@ test_that("Are the data being prepared correctly?", {
   expect_error(parse_data(data.frame(a = c("dog", "cat"), b = 1:2)),
                "Doses and responses should be numeric")
   # Number of doses
-  expect_error(parse_data(test_data_tnt[test_data_tnt$dose %in% c(0,1.25),]),
+  expect_error(parse_data(test_data_tnt[test_data_tnt$dose %in% c(1.25, 5),]),
                "At least 4 doses required for spline interpolation")
   # Doses with insufficient data
-  parse_test_2 <- rbind.data.frame(test_data_tnt[!test_data_tnt$dose %in% c(0,1.25),],
-                                   test_data_tnt[test_data_tnt$dose == 0,][1,],
+  parse_test_2 <- rbind.data.frame(test_data_tnt[!test_data_tnt$dose %in% c(1.25,5),],
+                                   test_data_tnt[test_data_tnt$dose == 5,][1,],
                                    test_data_tnt[test_data_tnt$dose == 1.25,][1,])
   
   expect_error(parse_data(parse_test_2),
-               "Insufficient Data. At least 5 doses require at least 3 responses")
+               "Insufficient Data. At least 4 doses require at least 3 responses")
 })
