@@ -18,12 +18,12 @@ test_that("Are the data being prepared correctly?", {
                "Doses and responses should be numeric")
   # Number of doses
   expect_error(parse_data(test_data_tnt[test_data_tnt$dose %in% c(1.25, 5),]),
-               "At least 4 doses required for spline interpolation")
+               "At least 4 non-zero doses with 3 replicates required for spline interpolation")
   # Doses with insufficient data
   parse_test_2 <- rbind.data.frame(test_data_tnt[!test_data_tnt$dose %in% c(1.25,5),],
                                    test_data_tnt[test_data_tnt$dose == 5,][1,],
                                    test_data_tnt[test_data_tnt$dose == 1.25,][1,])
-  
-  expect_error(parse_data(parse_test_2),
-               "Insufficient Data. At least 4 doses require at least 3 responses")
+  expect_error(expect_warning(parse_data(parse_test_2), 
+                              "Minimum of 3 replicates per dose. Removing doses from dataset: 1.25, 5"),
+               "At least 4 non-zero doses with 3 replicates required for spline interpolation")
 })
