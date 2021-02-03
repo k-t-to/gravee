@@ -2,16 +2,26 @@ Package: gravee
 Title: Good Risk Assessment Values for Environmental Exposures
 Version: 0.0.0.9000
 Authors@R: 
-    person(given = "First",
-           family = "Last",
-           role = c("aut", "cre"),
-           email = "first.last@example.com",
-           comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: Estimating Point of Departure (POD) from dose-response data using spline meta-regression.
+    c(person(given = "Lyle",
+           family = "Burgoon",
+           role = c("aut"),
+           email = "lyle.d.burgoon@usace.army.mil"),
+    person(given = "Kimberly",
+           family = "To",
+           role = c("cre", "aut"),
+           email = "kimberly.t.to@erdc.dren.mil"))
+Description: Estimating Point of Departure (POD) from dose-response data using 
+    spline meta-regression. GRAVEE uses bootstrap resampling on dose-response
+    data and spline meta-regression to fit dose-response curves. Menger
+    Curvature is used to estimate Points of Departure on the simulated dose-
+    response curves. GRAVEE returns a 95% interval for POD estimates for
+    a chemical. 
 Imports:
 	testthat
-License: `use_mit_license()`, `use_gpl3_license()` or friends to
-    pick a license
+License: This work was created by US government employees working in their 
+    government capacity. As a result, this work is in the public domain within 
+    the United States. The US Government may exercise copyright in other 
+    jurisdictions.
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
