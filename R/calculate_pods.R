@@ -10,6 +10,7 @@
 #'  of predicted responses from an interpolation spline.
 #' @param dose_response_parsed input data for main analysis
 #' @param interpolated_doses sequence of doses to predict responses from spline model
+#' @param spline_res Logical, default = False Return the output of the spline fit
 #' @importFrom stats dist
 #' @importFrom stats predict
 #' @keywords internal
@@ -61,11 +62,11 @@ calculate_pod_from_menger_curvature <- function(predicted_dose_response) {
   # Return the dose corresponding to the highest curvature.
   pod <- MC_values$log10_dose[which.max(MC_values$mc)]
   c(pod = 10^(pod),
-             log10_pod = pod)
+    log10_pod = pod)
 }
 
 # Perform bootstrap POD estimation ----- 
-perform_bootstrap <- function(dose_response_parsed, interpolated_doses) {
+perform_bootstrap <- function(dose_response_parsed, interpolated_doses, spline_res=F) {
   bootstrap_responses <- lapply(dose_response_parsed, 
                                 function(x) x[sample(nrow(x),1),])
   bootstrap_responses <- do.call("rbind", bootstrap_responses)
@@ -75,5 +76,10 @@ perform_bootstrap <- function(dose_response_parsed, interpolated_doses) {
   # Predict responses for interpolated doses
   pred_vals <- predict(bs_spline_model, interpolated_doses)
   # Get and return POD
-  calculate_pod_from_menger_curvature(pred_vals)
+  pod <- calculate_pod_from_menger_curvature(pred_vals)
+  if (spline_res) {
+    return(list(pod, pred_vals))
+  } else {
+    return(list(pod))
+  }
 }
