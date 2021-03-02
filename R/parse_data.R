@@ -4,9 +4,6 @@
 #' a single dose
 #' @param dose_response_data A table containing dose-response data from a single study assay. 
 #' The data should have two numeric columns with the first containing dose and the second
-#' @param dr_threshold A value between 0 and 1. Default 0.8. The percentage of doses that 
-#' have at least 3 responses. Allows cases where some doses have few samples. 
-#' containing response. 
 #' @keywords internal
 #' @noRd
 
