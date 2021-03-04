@@ -8,7 +8,7 @@ calculate_pod_quantiles(
   dose_response_data,
   resample_size = 1000,
   interpolation_size = 50,
-  quantile_probs = c(0.05, 0.5, 0.95),
+  quantile_probs = c(0.025, 0.5, 0.975),
   spline_res = F
 )
 }
