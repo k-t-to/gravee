@@ -6,7 +6,7 @@ test_that("Are the predicted PODs as expected?", {
   expect_length(temp_1, 2)
   expect_length(temp_1[[1]], 5)
   expect_length(temp_1[[2]], 3)
-  expect_true(round(temp_1[[2]][2], 4) == 0.4388)
+  expect_true(round(temp_1[[2]][2], 4) == 0.4617)
   
   temp_2 <- calculate_pod_quantiles(test_data_toxpod, resample_size = 20)
   expect_length(temp_2[[2]], 3)
