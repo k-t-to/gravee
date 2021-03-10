@@ -47,15 +47,19 @@ calculate_pod_quantiles <- function(dose_response_data,
   # Perform bootstrap
   pods <- lapply(1:resample_size, function(x) perform_bootstrap(dose_response_parsed, interpolated_doses, spline_res=spline_res))
   
-  # Rescale PODs
+  # Pull PODs
   doses <- as.numeric(names(dose_response_parsed))
   pods_dose <- sapply(pods, function(x) x[[1]]["pod"])
   names(pods_dose) <- NULL
   
+  # Rescale PODs if data has dose = 0
   if (any(doses == 0)) {
+    # Get minimum non zero-dose
     min_dose <- min(doses[doses != 0])
+    # Get PODs < min non-zero dose
     is_small <- pods_dose <= min_dose
     if (any(is_small)) {
+      # Rescale small PODs to be left bound by 0
       pod_small <- pods_dose[is_small]
       trans_0 <- min_dose/10
       pod_small <- c(trans_0, min_dose, pod_small)
