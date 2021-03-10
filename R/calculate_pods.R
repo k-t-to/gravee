@@ -1,6 +1,6 @@
 #' Menger Curvature POD Estimations
-#' @description Functions for calculating curvature along a curve and 
-#' returning the POD estimate for a single boostrap sample
+#' @description Functions for calculating Menger Curvature alone bootstrapped
+#' dose-response curves and returning estimated PODs
 #' @param interpolated_dose_vector Numeric vector of length 3 containing
 #'  doses corresponding to x-axis values.
 #' @param predicted_response_vector Numeric vector of length 3 containing

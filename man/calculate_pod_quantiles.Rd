@@ -25,6 +25,28 @@ sample's concentration.}
 
 \item{spline_res}{Logical, default = False Return the output of the spline fit}
 }
+\value{
+A list is returned. The first component is a numeric vector of length \code{resample_size} containing the
+estimated PODs from all bootstrap samples, on the original dose scale. The second element returns
+the credible interval of PODs with the boundaries defined by \code{quantile_probs}. If \code{spline_res=T}, the
+third element of the list is a data frame with spline fit predictions for all bootstrap samples.
+}
 \description{
 Returns quantiles from estimated Point of Departure distribution
+}
+\details{
+Analysis is performed on log10-transformed doses. The returned PODs and interpolated doses are
+back transformed to the original dose scale.
+
+If the input data contains a dose = 0, the 0 dose is converted to be 1/10th the minimum non-zero
+dose, such that after log10-transformation, the distance between the 0 dose and minimum non-zero
+dose is 1. For PODs and interpolated doses less than the minimum non-zero dose, values are
+back-transformed and rescaled to be left bound by 0. Thus, in the spline result data frame,
+for interpolated doses less than the minimum non-zero dose, values in the \code{log10dose} column
+will not be equal to log10 of the \code{dose} column.
+
+POD estimation assumes that the input dose-response data are asymptotic at low-doses. If the
+lower limit of the POD credible interval is within the two smallest doses, the function will
+return a warning: \verb{POD Credible Interval violates low-dose asymptote assumption.} In this
+case, verify that an asymptote has been established at lower doses of the input data.
 }
