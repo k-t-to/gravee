@@ -16,7 +16,7 @@
 #' @keywords internal
 #' @noRd
 
-# Calculate Menger Curvature ----- 
+# Calculate Menger Curvature -----
 # Given three xy-coordinates, calculates their Menger Curvature.
 calculate_menger_curvature <- function(interpolated_dose_vector,
                                        predicted_response_vector) {
@@ -45,41 +45,52 @@ calculate_pod_from_menger_curvature <- function(predicted_dose_response) {
   n_3 <- length(predicted_dose_response$x) - 2
   MC_values <- list(
     log10_dose = vector("double", n_3),
-    mc = vector("double", n_3)
+    mc         = vector("double", n_3)
   )
+
   # Loop through data and calculate MC
   for (i in 1:n_3) {
     end <- i + 2
     dose_temp <- predicted_dose_response$x[i:end]
     response_temp <- predicted_dose_response$y[i:end]
     MC_temp <- calculate_menger_curvature(
-      interpolated_dose_vector = dose_temp,
+      interpolated_dose_vector  = dose_temp,
       predicted_response_vector = response_temp
     )
     MC_values[["log10_dose"]][i] <- dose_temp[2]
     MC_values[["mc"]][i] <- MC_temp
   }
+
   # Return the dose corresponding to the highest curvature.
   pod <- MC_values$log10_dose[which.max(MC_values$mc)]
-  c(pod = 10^(pod),
-    log10_pod = pod)
+  spline_pred <- data.frame(log10_dose    = predicted_dose_response$x,
+                            response_pred = predicted_dose_response$y)
+  spline_pred$mc <- MC_values$mc[match(spline_pred$log10_dose, MC_values$log10_dose)]
+
+  list(
+    spline_res = spline_pred,
+    log10_pod  = pod
+  )
 }
 
 # Perform bootstrap POD estimation ----- 
 perform_bootstrap <- function(dose_response_parsed, interpolated_doses, spline_res=F) {
-  bootstrap_responses <- lapply(dose_response_parsed, 
+  bootstrap_responses <- lapply(dose_response_parsed,
                                 function(x) x[sample(nrow(x),1),])
   bootstrap_responses <- do.call("rbind", bootstrap_responses)
+
   # Create spline model
-  bs_spline_model <- splines::interpSpline(bootstrap_responses[,2], 
+  bs_spline_model <- splines::interpSpline(bootstrap_responses[,2],
                                            bootstrap_responses[,3])
+
   # Predict responses for interpolated doses
   pred_vals <- predict(bs_spline_model, interpolated_doses)
+
   # Get and return POD
   pod <- calculate_pod_from_menger_curvature(pred_vals)
   if (spline_res) {
-    return(list(pod, pred_vals))
+    return(pod)
   } else {
-    return(list(pod))
+    return(pod[2])
   }
 }
