@@ -1,4 +1,4 @@
-context("calculate_pods.R")
+context("calculate_curvature.R")
 
 test_that("Does Menger Curvature calculation perform as expected?", {
   # Does the function stop if the input vectors are incorrect length?
@@ -31,5 +31,6 @@ test_that("Does the correct POD get returned from MC calculations?", {
     x = 1:10,
     y = sin(1:10)
   )
-  expect_true(calculate_pod_from_menger_curvature(sim_predictedDR)["log10_pod"] == 8)
+  pred_out <- calculate_spline_curvature(sim_predictedDR)
+  expect_equal(pred_out$log10_dose[which.max(pred_out$mc)], 8)
 })

@@ -1,6 +1,6 @@
-#' Menger Curvature POD Estimations
-#' @description Functions for calculating Menger Curvature alone bootstrapped
-#' dose-response curves and returning estimated PODs
+#' Menger Curvature Calculations
+#' @description Functions for calculating Menger Curvature along bootstrapped
+#' dose-response curves
 #' @param interpolated_dose_vector Numeric vector of length 3 containing
 #'  doses corresponding to x-axis values.
 #' @param predicted_response_vector Numeric vector of length 3 containing
@@ -10,7 +10,6 @@
 #'  of predicted responses from an interpolation spline.
 #' @param dose_response_parsed input data for main analysis
 #' @param interpolated_doses sequence of doses to predict responses from spline model
-#' @param spline_res Logical, default = False Return the output of the spline fit
 #' @importFrom stats dist
 #' @importFrom stats predict
 #' @keywords internal
@@ -39,8 +38,8 @@ calculate_menger_curvature <- function(interpolated_dose_vector,
   as.numeric(numerator / denominator)
 }
 
-# Calculate sequential Menger Curvatures and return the max -----
-calculate_pod_from_menger_curvature <- function(predicted_dose_response) {
+# Calculate Menger Curvature given spline predictions
+calculate_spline_curvature <- function(predicted_dose_response) {
   # Declare list to store calculations
   n_3 <- length(predicted_dose_response$x) - 2
   MC_values <- list(
@@ -61,20 +60,15 @@ calculate_pod_from_menger_curvature <- function(predicted_dose_response) {
     MC_values[["mc"]][i] <- MC_temp
   }
 
-  # Return the dose corresponding to the highest curvature.
-  pod <- MC_values$log10_dose[which.max(MC_values$mc)]
-  spline_pred <- data.frame(log10_dose    = predicted_dose_response$x,
-                            response_pred = predicted_dose_response$y)
-  spline_pred$mc <- MC_values$mc[match(spline_pred$log10_dose, MC_values$log10_dose)]
-
-  list(
-    spline_res = spline_pred,
-    log10_pod  = pod
-  )
+  # Return curvature for interpolated data
+  spline_mc <- data.frame(log10_dose    = predicted_dose_response$x,
+                          response_pred = predicted_dose_response$y)
+  spline_mc$mc <- MC_values$mc[match(spline_mc$log10_dose, MC_values$log10_dose)]
+  spline_mc
 }
 
-# Perform bootstrap POD estimation ----- 
-perform_bootstrap <- function(dose_response_parsed, interpolated_doses, spline_res=F) {
+# Perform bootstrap sampling and curve calculations ----- 
+perform_bootstrap <- function(dose_response_parsed, interpolated_doses, bs_id) {
   bootstrap_responses <- lapply(dose_response_parsed,
                                 function(x) x[sample(nrow(x),1),])
   bootstrap_responses <- do.call("rbind", bootstrap_responses)
@@ -84,13 +78,20 @@ perform_bootstrap <- function(dose_response_parsed, interpolated_doses, spline_r
                                            bootstrap_responses[,3])
 
   # Predict responses for interpolated doses
-  pred_vals <- predict(bs_spline_model, interpolated_doses)
+  pred_vals <- predict(bs_spline_model, interpolated_doses$log10_dose)
 
-  # Get and return POD
-  pod <- calculate_pod_from_menger_curvature(pred_vals)
-  if (spline_res) {
-    return(pod)
-  } else {
-    return(pod[2])
-  }
+  # Calculate Menger Curvature
+  mc <- calculate_spline_curvature(pred_vals)
+  # Add back original doses
+  mc$dose <- interpolated_doses$dose[match(mc$log10_dose, interpolated_doses$log10_dose)]
+  # Add bootstrap id
+  mc$bs_index <- bs_id
+  mc <- mc[,c("bs_index", "dose", "log10_dose", "response_pred", "mc")]
+  bootstrap_responses$bs_index <- bs_id
+  bootstrap_responses <- bootstrap_responses[,c("bs_index", "dose", "log10_dose", "response")]
+
+  # Return menger curvature dataframe and bootstrap sample dataframe
+  list(mc = mc,
+       bootstrap_sample = bootstrap_responses)
 }
+

@@ -8,45 +8,58 @@ calculate_pod_quantiles(
   dose_response_data,
   resample_size = 1000,
   interpolation_size = 50,
-  quantile_probs = c(0.025, 0.5, 0.975),
-  spline_res = F
+  quantile_probs = c(0.025, 0.5, 0.975)
 )
 }
 \arguments{
-\item{dose_response_data}{Data frame with rows representing assays/genes and columns representing samples.
-The first column should contain assay/gene identifiers. Column names should be numeric values of the
-sample's concentration.}
+\item{dose_response_data}{Data frame with two numeric columns. The first
+column should contain doses and the second column should contain the responses.}
 
-\item{resample_size}{The number of resamples to perform}
+\item{resample_size}{The number of bootstrap samples}
 
-\item{interpolation_size}{The number of doses to perform spline predictions for response}
+\item{interpolation_size}{The number of doses to interpolate between the
+minimum and maximum doses for spline prediction}
 
 \item{quantile_probs}{The quantiles to report for POD predictions}
-
-\item{spline_res}{Logical, default = False Return the output of the spline fit}
 }
 \value{
-A list is returned. The first component is a numeric vector of length \code{resample_size} containing the
-estimated PODs from all bootstrap samples, on the original dose scale. The second element returns
-the credible interval of PODs with the boundaries defined by \code{quantile_probs}. If \code{spline_res=T}, the
-third element of the list is a data frame with spline fit predictions for all bootstrap samples.
+The returned object prints the POD quantiles to the console. The returned object
+is a gravee list with four named components. The first component \code{pods} is a
+vector of length \code{resample_size} containing the estimated PODs from all bootstrap
+samples, on the original dose scale. The second element \code{pod_quantiles} contains
+the POD quantiles, with boundaries defined by \code{quantile_probs}. The third
+component \code{all_res} is a list of length \code{resample_size} containing the
+interpolated spline predictions from each bootstrap sample and curvature
+measurements along the fit curve. The fourth component \code{bs_samples} is a list
+of length \code{resample_size} containing the sampled values for each bootstrap
+sample.
 }
 \description{
-Returns quantiles from estimated Point of Departure distribution
+Estimate a chemical Point of Departure (POD) from dose-response data using
+bootstrap resampling and spline meta-regression
 }
 \details{
-Analysis is performed on log10-transformed doses. The returned PODs and interpolated doses are
+Analysis is performed on log10-transformed doses. The returned PODs are
 back transformed to the original dose scale.
 
-If the input data contains a dose = 0, the 0 dose is converted to be 1/10th the minimum non-zero
-dose, such that after log10-transformation, the distance between the 0 dose and minimum non-zero
-dose is 1. For PODs and interpolated doses less than the minimum non-zero dose, values are
-back-transformed and rescaled to be left bound by 0. Thus, in the spline result data frame,
-for interpolated doses less than the minimum non-zero dose, values in the \code{log10dose} column
+If the input data contains a dose = 0, the 0 dose is converted to be 1/10th
+the minimum non-zero dose, such that after log10-transformation, the distance
+between the 0 dose and minimum non-zero dose is 1. For PODs and interpolated
+doses less than the minimum non-zero dose, values are back-transformed and
+rescaled to be left bound by 0. Thus, in the output, for interpolated doses
+less than the minimum non-zero dose, values in the \code{log10_dose} column
 will not be equal to log10 of the \code{dose} column.
 
-POD estimation assumes that the input dose-response data are asymptotic at low-doses. If the
-lower limit of the POD credible interval is within the two smallest doses, the function will
-return a warning: \verb{POD Credible Interval violates low-dose asymptote assumption.} In this
-case, verify that an asymptote has been established at lower doses of the input data.
+POD estimation assumes that the input dose-response data are asymptotic at
+low-doses. If the lower limit of the POD credible interval is within the two
+smallest doses, the function will return a warning:
+\verb{POD Credible Interval violates low-dose asymptote assumption.} In this case,
+verify that an asymptote has been established at lower doses of the input data.
+}
+\examples{
+x <- rep(c(0,0.05,0.1,0.5,1), each = 3)
+y <- 1/exp(-x) + abs(rnorm(length(x)))
+df <- data.frame(x,y)
+pods <- calculate_pod_quantiles(df)
+plot(pods)
 }
